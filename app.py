@@ -6,6 +6,7 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
 import csv
@@ -30,28 +31,39 @@ with open('data/degrees-that-pay-back.csv', 'r') as f:
         degrees_list.append(row)
 df = pd.DataFrame(degrees_list[1:], columns=degrees_list[0])
 
-fig = px.bar(df, x="Undergraduate Major", y="Starting Median Salary", barmode="group")
+fig = px.bar(df, x="Undergraduate Major", y="Starting Median Salary",barmode="group")
 
 app.layout = html.Div(children=[
-    html.H1(children='Hello World'),
+    html.H1(children='College Salaries'),
 
     dcc.Dropdown(
+        id='degree_options',
         options=[
-            {'label': 'Starting Median Salary', 'value': 'SMS'},
-            {'label': 'Mid-Career Median Salary', 'value': 'MCMS'},
-            {'label': 'Mid-Career 10th Percentile Salary', 'value': 'MC10'},
-            {'label': 'Mid-Career 25th Percentile Salary', 'value': 'MC25'},
-            {'label': 'Mid-Career 75th Percentile Salary', 'value': 'MC75'},
-            {'label': 'Mid-Career 90th Percentile Salary', 'value': 'MC90'},
+            {'label': 'Starting Median Salary', 'value': 'Starting Median Salary'},
+            {'label': 'Mid-Career Median Salary', 'value': 'Mid-Career Median Salary'},
+            {'label': 'Mid-Career 10th Percentile Salary', 'value': 'Mid-Career 10th Percentile Salary'},
+            {'label': 'Mid-Career 25th Percentile Salary', 'value': 'Mid-Career 25th Percentile Salary'},
+            {'label': 'Mid-Career 75th Percentile Salary', 'value': 'Mid-Career 75th Percentile Salary'},
+            {'label': 'Mid-Career 90th Percentile Salary', 'value': 'Mid-Career 90th Percentile Salary'},
         ],
-        value='MTL'
+        value='Starting Median Salary'
     ),
 
     dcc.Graph(
-        id='example-graph',
+        id='degree_graph',
         figure=fig
     )
 ])
+
+
+@app.callback(
+    Output('degree_graph', 'figure'),
+    Input('degree_options', 'value')
+)
+def update_degree(degree_options):
+    new_fig = px.bar(df, x="Undergraduate Major", y=degree_options,barmode="group")
+    return new_fig
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)

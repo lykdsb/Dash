@@ -14,7 +14,7 @@ import csv
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
+# ------------This is degree list----------------------------------------------
 # assume you have a "long-form" data frame
 # see https://plotly.com/python/px-arguments/ for more options
 degrees_list = []
@@ -29,10 +29,20 @@ with open('data/degrees-that-pay-back.csv', 'r') as f:
             row[6] = float(row[6][1:].replace(",", ""))
             row[7] = float(row[7][1:].replace(",", ""))
         degrees_list.append(row)
-df = pd.DataFrame(degrees_list[1:], columns=degrees_list[0])
+degrees_df = pd.DataFrame(degrees_list[1:], columns=degrees_list[0])
 
-fig = px.bar(df, x="Undergraduate Major", y="Starting Median Salary",barmode="group")
-
+degrees_fig = px.bar(degrees_df, x="Undergraduate Major", y="Starting Median Salary", barmode="group")
+# ----------------------This is college type-----------------------------------------------------
+colleges_list = []
+with open('data/salaries-by-college-type.csv', 'r') as f:
+    reader = csv.reader(f)
+    for row in reader:
+        colleges_list.append(row)
+colleges_df = pd.DataFrame(colleges_list[1:], columns=colleges_list[0])
+colleges_df = pd.DataFrame(colleges_df["School Type"].value_counts()).reset_index()
+colleges_df.columns = ['School Type', 'Count']
+colleges_fig = px.pie(colleges_df, names="School Type", values="Count")
+# -----------------------------------------------------------
 app.layout = html.Div(children=[
     html.H1(children='College Salaries'),
 
@@ -51,7 +61,12 @@ app.layout = html.Div(children=[
 
     dcc.Graph(
         id='degree_graph',
-        figure=fig
+        figure=degrees_fig
+    ),
+    dcc.Graph
+        (
+        id="college_graph",
+        figure=colleges_fig
     )
 ])
 
@@ -61,7 +76,7 @@ app.layout = html.Div(children=[
     Input('degree_options', 'value')
 )
 def update_degree(degree_options):
-    new_fig = px.bar(df, x="Undergraduate Major", y=degree_options,barmode="group")
+    new_fig = px.bar(degrees_df, x="Undergraduate Major", y=degree_options, barmode="group")
     return new_fig
 
 

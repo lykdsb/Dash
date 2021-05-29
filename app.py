@@ -42,7 +42,20 @@ colleges_df = pd.DataFrame(colleges_list[1:], columns=colleges_list[0])
 colleges_df = pd.DataFrame(colleges_df["School Type"].value_counts()).reset_index()
 colleges_df.columns = ['School Type', 'Count']
 colleges_fig = px.pie(colleges_df, names="School Type", values="Count")
-# -----------------------------------------------------------
+# ----------------------This is region------------------------------------------------
+regions_list = []
+with open('data/salaries-by-region.csv', 'r') as f:
+    reader = csv.reader(f)
+    for row in reader:
+        if len(regions_list) > 0:
+            row[2] = float(row[2][1:].replace(",", ""))
+            row[3] = float(row[3][1:].replace(",", ""))
+        regions_list.append(row)
+regions_df = pd.DataFrame(regions_list[1:], columns=regions_list[0])
+regions_fig = px.scatter(regions_df, x="Starting Median Salary", y="Mid-Career Median Salary", color="Region",
+                         hover_name="School Name")
+
+# ------------------------------------------------------------------------------------
 app.layout = html.Div(children=[
     html.H1(children='College Salaries'),
 
@@ -56,7 +69,7 @@ app.layout = html.Div(children=[
             {'label': 'Mid-Career 75th Percentile Salary', 'value': 'Mid-Career 75th Percentile Salary'},
             {'label': 'Mid-Career 90th Percentile Salary', 'value': 'Mid-Career 90th Percentile Salary'},
         ],
-        value='Starting Median Salary'
+        value='Starting Median Salary',
     ),
 
     dcc.Graph(
@@ -67,6 +80,10 @@ app.layout = html.Div(children=[
         (
         id="college_graph",
         figure=colleges_fig
+    ),
+    dcc.Graph(
+        id="region_graph",
+        figure=regions_fig
     )
 ])
 

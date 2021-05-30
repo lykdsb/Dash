@@ -67,12 +67,14 @@ regions_df1.columns = ['Region', 'Count']
 regions_fig1 = px.pie(regions_df1, names="Region", values="Count")
 regions_df2 = pd.DataFrame(regions_list2[1:], columns=regions_list2[0])
 regions_fig2 = px.scatter(regions_df2, x="Starting Median Salary", y="Mid-Career Median Salary", color="Region",
-                         hover_name="School Name")
+                          hover_name="School Name")
 
 # ------------------------------------------------------------------------------------
 app.layout = html.Div(children=[
-    html.H1(children='College Salaries'),
-
+    html.H1(children='College Salaries',
+            style={'text-align': 'center'}),
+    html.H4(children='Degrees That Pay Back',
+            style={'text-align': 'center'}),
     dcc.Dropdown(
         id='degree_options',
         options=[
@@ -92,6 +94,8 @@ app.layout = html.Div(children=[
         figure=degrees_fig
 
     ),
+    html.H4(children='Salaries By College Type',
+            style={'text-align': 'center'}),
     dcc.Graph
         (
         id="college_graph1",
@@ -104,6 +108,8 @@ app.layout = html.Div(children=[
         figure=colleges_fig2,
         style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}
     ),
+    html.H4(children='Salaries By Region',
+            style={'text-align': 'center'}),
     dcc.Graph(
         id="region_graph1",
         figure=regions_fig1,

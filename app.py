@@ -33,26 +33,40 @@ degrees_df = pd.DataFrame(degrees_list[1:], columns=degrees_list[0])
 
 degrees_fig = px.bar(degrees_df, x="Undergraduate Major", y="Starting Median Salary", barmode="group")
 # ----------------------This is college type-----------------------------------------------------
-colleges_list = []
+colleges_list1 = []
+colleges_list2 = []
 with open('data/salaries-by-college-type.csv', 'r') as f:
     reader = csv.reader(f)
     for row in reader:
-        colleges_list.append(row)
-colleges_df = pd.DataFrame(colleges_list[1:], columns=colleges_list[0])
-colleges_df = pd.DataFrame(colleges_df["School Type"].value_counts()).reset_index()
-colleges_df.columns = ['School Type', 'Count']
-colleges_fig = px.pie(colleges_df, names="School Type", values="Count")
+        colleges_list1.append(row)
+        if len(colleges_list2) > 0:
+            row[2] = float(row[2][1:].replace(",", ""))
+            row[3] = float(row[3][1:].replace(",", ""))
+        colleges_list2.append(row)
+colleges_df1 = pd.DataFrame(colleges_list1[1:], columns=colleges_list1[0])
+colleges_df1 = pd.DataFrame(colleges_df1["School Type"].value_counts()).reset_index()
+colleges_df1.columns = ['School Type', 'Count']
+colleges_fig1 = px.pie(colleges_df1, names="School Type", values="Count")
+colleges_df2 = pd.DataFrame(colleges_list2[1:], columns=colleges_list2[0])
+colleges_fig2 = px.scatter(colleges_df2, x="Starting Median Salary", y="Mid-Career Median Salary", color="School Type",
+                           hover_name="School Name")
 # ----------------------This is region------------------------------------------------
-regions_list = []
+regions_list1 = []
+regions_list2 = []
 with open('data/salaries-by-region.csv', 'r') as f:
     reader = csv.reader(f)
     for row in reader:
-        if len(regions_list) > 0:
+        regions_list1.append(row)
+        if len(regions_list2) > 0:
             row[2] = float(row[2][1:].replace(",", ""))
             row[3] = float(row[3][1:].replace(",", ""))
-        regions_list.append(row)
-regions_df = pd.DataFrame(regions_list[1:], columns=regions_list[0])
-regions_fig = px.scatter(regions_df, x="Starting Median Salary", y="Mid-Career Median Salary", color="Region",
+        regions_list2.append(row)
+regions_df1 = pd.DataFrame(regions_list1[1:], columns=regions_list1[0])
+regions_df1 = pd.DataFrame(regions_df1["Region"].value_counts()).reset_index()
+regions_df1.columns = ['Region', 'Count']
+regions_fig1 = px.pie(regions_df1, names="Region", values="Count")
+regions_df2 = pd.DataFrame(regions_list2[1:], columns=regions_list2[0])
+regions_fig2 = px.scatter(regions_df2, x="Starting Median Salary", y="Mid-Career Median Salary", color="Region",
                          hover_name="School Name")
 
 # ------------------------------------------------------------------------------------
@@ -70,20 +84,35 @@ app.layout = html.Div(children=[
             {'label': 'Mid-Career 90th Percentile Salary', 'value': 'Mid-Career 90th Percentile Salary'},
         ],
         value='Starting Median Salary',
+        style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}
     ),
 
     dcc.Graph(
         id='degree_graph',
         figure=degrees_fig
+
     ),
     dcc.Graph
         (
-        id="college_graph",
-        figure=colleges_fig
+        id="college_graph1",
+        figure=colleges_fig1,
+        style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}
+    ),
+    dcc.Graph
+        (
+        id="college_graph2",
+        figure=colleges_fig2,
+        style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}
     ),
     dcc.Graph(
-        id="region_graph",
-        figure=regions_fig
+        id="region_graph1",
+        figure=regions_fig1,
+        style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}
+    ),
+    dcc.Graph(
+        id="region_graph2",
+        figure=regions_fig2,
+        style={'width': '49%', 'display': 'inline-block', 'padding': '0 20'}
     )
 ])
 
